@@ -265,7 +265,7 @@ def plotly_inds(coin_hist_prices,inds=[],start_date='2001-01-01',end_date='2001-
                 dict(step="all")
             ])
         ), rangeslider=dict(visible=True), type="date"), legend_orientation='h' )
-    
+    fig.update_yaxes({'fixedrange':False})
     return fig.show()
 # we have to return fig.show() if we want the function to actualluy plot!
 
@@ -316,6 +316,8 @@ def plotly_price_vs_inds (coin_hist_prices,vs_inds=[],start_date='2001-01-01',en
             ])
         ), rangeslider=dict(visible=True), type="date"), legend_orientation='h' )
     
+    fig.update_yaxes({'fixedrange':False})
+
     return fig.show()
 # plot UPTO 3 indicators vs price
 # LATER: add LEGEND
@@ -369,6 +371,8 @@ def plotly_signals (coin_hist_prices,start_date='2001-01-01',end_date='2001-01-0
                 dict(step="all")
             ])
         ), rangeslider=dict(visible=True), type="date"), legend_orientation='h' )
-    
+   
+    fig.update_yaxes({'fixedrange':False})
+
     
     return fig.show()
