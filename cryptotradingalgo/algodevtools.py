@@ -376,3 +376,57 @@ def plotly_signals (coin_hist_prices,start_date='2001-01-01',end_date='2001-01-0
 
     
     return fig.show()
+
+# plot signals as well as upto 3 signals 
+
+def plotly_signals_and_inds (coin_hist_prices,vs_inds=[],start_date='2001-01-01',end_date='2001-01-01', num_days=180,colors=['orange','purple','cyan']): # or inds_on_price?
+    
+    start_date = dt.datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
+    default_date=dt.datetime.strptime('2001-01-01', '%Y-%m-%d')
+    
+  
+    # set the dates
+    if (start_date==default_date) & (end_date==default_date):
+            end_date=coin_hist_prices.iloc[len(coin_hist_prices)-2]['date']
+            start_date=end_date - dt.timedelta(days=num_days)
+
+    elif start_date==default_date:
+        start_date= end_date - dt.timedelta(days=num_days) 
+    elif end_date==default_date:
+        end_date=start_date + dt.timedelta(days=num_days)
+    print('start date:',start_date,'end date:',end_date)
+    
+    plot_data=data=coin_hist_prices.loc[((coin_hist_prices['date']>=start_date)&(coin_hist_prices['date']<=end_date))]
+    
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    # Plot price
+    fig.add_trace(go.Scatter(x=plot_data['date'],y=plot_data['price'],name='Price',mode='lines', 
+                             opacity=0.2, line_color='black'),secondary_y=False)
+
+    # plot vs indicators 
+    for (i,ind) in enumerate(vs_inds):
+            fig.add_trace(go.Scatter(x=plot_data['date'],y=plot_data[ind],name=ind,mode='lines', 
+                             line_color=colors[i]),secondary_y=True)
+     # plot signals
+    for index, row in plot_data.iterrows():
+        if (row['trade_reco'] == 'BUY'):
+            fig.add_annotation(x=row['date'], y=row['price'],text="BUY", font={'color':'green','size':12},showarrow=True, arrowhead=2)
+        elif (row['trade_reco'] == 'SELL'):
+            fig.add_annotation(x=row['date'], y=row['price'],text="SELL", font={'color':'red','size':12},showarrow=True, arrowhead=2)
+
+    fig.update_layout(autosize=False, width=1400, height=700,margin=go.layout.Margin(
+        l=20, r=20, b=20, t=20, pad = 1),
+        xaxis=dict(rangeselector=dict( buttons=list([
+                dict(count=1,label="1m", step="month", stepmode="backward"),
+                dict(count=6,label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(step="all")
+            ])
+        ), rangeslider=dict(visible=True), type="date"), legend_orientation='h' )
+   
+    fig.update_yaxes({'fixedrange':False})
+    
+    return fig.show()
